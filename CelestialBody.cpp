@@ -9,11 +9,11 @@ namespace Space{
 
 
 
-	CelestialBody::CelestialBody(double Mass, double xPos, double yPos, double xVel, double yVel, std::string name,CelestialBody* isOrbiting): m_Mass{Mass}, m_xPos{xPos}, m_yPos{yPos}, m_xVel{xVel}, m_yVel{yVel}, m_name{name}, isOrbiting{isOrbiting} {};
+	CelestialBody::CelestialBody(double Mass, double xPos, double yPos, double xVel, double yVel, std::string name,CelestialBody*  m_isOrbiting): m_Mass{Mass}, m_xPos{xPos}, m_yPos{yPos}, m_xVel{xVel}, m_yVel{yVel}, m_name{name}, m_isOrbiting{m_isOrbiting} {};
 
 	CelestialBody::CelestialBody(double Mass, double xPos, double yPos, double xVel, double yVel, std::string name): m_Mass{Mass}, m_xPos{xPos}, m_yPos{yPos}, m_xVel{xVel}, m_yVel{yVel}, m_name{name} {};
 
-	CelestialBody::CelestialBody(): m_Mass{0}, m_xPos{0}, m_yPos{0}, m_xVel{0}, m_yVel{0}, m_name{0}{};
+	CelestialBody::CelestialBody(): m_Mass{0}, m_xPos{0}, m_yPos{0}, m_xVel{0}, m_yVel{0}, m_name{""}{};
 	//Getters
 	double CelestialBody::getxPos() const { return m_xPos;}
 	double CelestialBody::getyPos() const { return m_yPos;}
@@ -24,19 +24,19 @@ namespace Space{
 	double CelestialBody::getMass() const { return m_Mass;}
 	double CelestialBody::getKinEnergy() const{
 
-	if(isOrbiting !=nullptr)
-		return 0.5*m_Mass*((m_xVel+isOrbiting->getxVel())*(m_xVel+isOrbiting->getxVel())+(m_yVel+isOrbiting->getyVel())*(m_yVel+isOrbiting->getyVel()));
+	if(m_isOrbiting !=nullptr)
+		return 0.5*m_Mass*((m_xVel+m_isOrbiting->getxVel())*(m_xVel+m_isOrbiting->getxVel())+(m_yVel+m_isOrbiting->getyVel())*(m_yVel+m_isOrbiting->getyVel()));
 	else
 		return 0.5*(getxVel()*getxVel() + getyVel()*getyVel())*getMass();
 
 	}
 	std::string CelestialBody::getName() const { return m_name;}
-	CelestialBody* CelestialBody::getOrbittingBody() const {return isOrbiting; }
+	CelestialBody* CelestialBody::getOrbittingBody() const {return m_isOrbiting; }
 	double CelestialBody::getG() const {return m_G;}
 	std::vector<CelestialBody*> CelestialBody::getObjects() const{
-		return orbitingBodies;
+		return m_orbitingBodies;
 	}
-	std::vector<CelestialBody*> CelestialBody::getRelevantBodies() const{
+	std::vector<CelestialBody* > CelestialBody::getRelevantBodies() const{
 		return m_relevantBodies;
 	}
 
@@ -49,16 +49,23 @@ namespace Space{
 	void CelestialBody::setyVel(double vy){ m_yVel = vy;}
 
 	void CelestialBody::setRelevantBodies(CelestialBody* obj) {
-		for(auto i: obj->getObjects()){
-			if(i->getName() != this->getName()){
+		for(auto i: getObjects()){
+
+			if(i->getName() != getName()){
 				m_relevantBodies.push_back(i);
 			}
 		}
-		if(this->getOrbittingBody() !=nullptr){
-			m_relevantBodies.push_back(this->getOrbittingBody());
+		
+		if(getOrbittingBody() !=nullptr){
+			m_relevantBodies.push_back(getOrbittingBody());
+			auto vect = getOrbittingBody()->getObjects();
+				for (auto x: vect){
+					if(x->getName() != getName()){
+						m_relevantBodies.push_back(x);
+				}
+			}
 		}
 	}
-
 
 	void CelestialBody::setRelevantBodiesAll(CelestialBody* obj) {
 		m_relevantBodies.push_back(obj);
@@ -67,7 +74,7 @@ namespace Space{
  	std::ostream& operator<<(std::ostream& os, const CelestialBody& obj){
 
 		std::vector<CelestialBody*> orbiting =  obj.getObjects();
-		
+
 		if(obj.getOrbittingBody() != nullptr){
 
 			os <<  obj.getName() << ":\n=============================\n"   << 
@@ -92,29 +99,28 @@ namespace Space{
 				os <<"\n    "<< i->getName() << "\n";
 			os << "\n-----------------------------------------\n";
 
-
 		}
 		return os;
 	}
 
 	double CelestialBody::getDistX(CelestialBody* obj){
-		double x1 = this->getxPos();
+		double x1 = getxPos();
 		double x2 = obj->getxPos();
 		return (x2-x1);
 	}
 
 		double CelestialBody::getDistY(CelestialBody* obj){
 
-		double y1 = this->getyPos();
+		double y1 = getyPos();
 		double y2 = obj->getyPos();
 		return (y2-y1);
 	}
 	void CelestialBody::setOrbiting(CelestialBody* obj){
-		isOrbiting=obj;
+		m_isOrbiting=obj;
 	}
 
-	void CelestialBody::addOrbitingBody(CelestialBody*obj){
-		orbitingBodies.push_back(obj);
+	void CelestialBody::addOrbitingBody(CelestialBody*  obj){
+		m_orbitingBodies.push_back(obj);
 	}
 	//evolution function
 
@@ -123,7 +129,7 @@ namespace Space{
 		m_FyAll=0;
 		std::vector<CelestialBody*> bodies = getRelevantBodies();
 		for(auto i : bodies){
-			const double GMm = this->getMass()*i->getMass()*this->getG();
+			const double GMm = getMass()*i->getMass()*getG();
 			double rx=getDistX(i);
 			double ry=getDistY(i);
 			double F = GMm/(rx*rx+ry*ry);
@@ -166,7 +172,6 @@ namespace Space{
 		
 		double ax= m_FxAll/m_Mass;
 		double ay =m_FyAll/m_Mass;
-		// std::cout << ax << " " << ay << std::endl;
 		kvx[0]=ax;
 		kvy[0]=ay;
 		krx[0]=m_xVel;
@@ -192,7 +197,7 @@ namespace Space{
 		setyPos(m_yPos+dt/6.0*(kry[0]+2*kry[1]+2*kry[2]+kry[3]));
 		setxVel(m_xVel+dt/6.0*(kvx[0]+2*kvx[1]+2*kvx[2]+kvx[3]));
 		setyVel(m_yVel+dt/6.0*(kvy[0]+2*kvy[1]+2*kvy[2]+kvy[3]));
-		// std::cout << dt/6.0*(krx[0]+2*krx[1]+2*krx[2]+krx[3]) << std::endl;
+
 		setFx(0);
 		setFy(0);
 

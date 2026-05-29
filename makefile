@@ -5,7 +5,7 @@ CXXFLAGS = -Wall -g -O2 -std=c++14
 TARGET = main
 
 TARGET_DEL = main.o
-SRCS = main.cpp CelestialBody.cpp Moon.cpp Planet.cpp Star.cpp Utils.cpp System.cpp
+SRCS = main.cpp CelestialBody.cpp Moon.cpp Planet.cpp Star.cpp System.cpp
 
 
 OBJS = $(SRCS:.cpp=.o)

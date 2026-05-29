@@ -19,8 +19,8 @@ class CelestialBody{
 		double m_FxAll;
 		double m_FyAll;
 		const std::string m_name;
-		std::vector<CelestialBody*> orbitingBodies;
-		CelestialBody* isOrbiting;
+		std::vector<CelestialBody*> m_orbitingBodies;
+		CelestialBody* m_isOrbiting;
 		std::vector<CelestialBody*> m_relevantBodies;
 
 
@@ -45,7 +45,7 @@ class CelestialBody{
 		std::string getName() const;
 		std::vector<CelestialBody*> getObjects() const;
 		std::vector<CelestialBody*> getRelevantBodies() const;
-		CelestialBody* getOrbittingBody() const;
+		CelestialBody* getOrbittingBody()const;
 
 		virtual void addForces();
 		virtual void RK4(double dt);

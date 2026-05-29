@@ -1,5 +1,3 @@
-
-#include "Utils.hpp"
 #include "System.hpp"
 
 int main(int argc, char *argv[]){
@@ -48,17 +46,19 @@ int main(int argc, char *argv[]){
 	//simulation execution
 
 	Space::System* syst = new Space::System();
-	Space::readFile(*syst,inputName); //default: solarsystem.csv
+	// Space::readFile(*syst,inputName); //default: solarsystem.csv
+	syst->readFile(inputName);
+
 
 	if(doAllinteractions)
-		Space::calculateRelevantBodiesAll(syst->getOribttingBodies());
+		syst->calculateRelevantBodiesAll();
 	else
-		Space::calculateRelevantBodies(syst); // dimensionality reduction
+		syst->calculateRelevantBodies();
 
-	Space::printObjects(syst->getOribttingBodies()); // info
-	Space::evolve(syst,N,dt,saveStep,index,outputName,doRK4); //evolution
+	syst->printObjects(); //info
+	syst->evolve(N,dt,saveStep,index,outputName,doRK4); //evolution
 
-
+	// delete(syst);
 
 
 	return 0;
