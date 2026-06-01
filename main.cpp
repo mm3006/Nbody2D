@@ -49,16 +49,17 @@ int main(int argc, char *argv[]){
 	// Space::readFile(*syst,inputName); //default: solarsystem.csv
 	syst->readFile(inputName);
 
-
 	if(doAllinteractions)
 		syst->calculateRelevantBodiesAll();
+	
 	else
 		syst->calculateRelevantBodies();
+		
 
-	syst->printObjects(); //info
+	// syst->printObjects(); //info
 	syst->evolve(N,dt,saveStep,index,outputName,doRK4); //evolution
 
-	// delete(syst);
+	delete(syst);
 
 
 	return 0;

@@ -14,6 +14,7 @@ namespace Space{
 	CelestialBody::CelestialBody(double Mass, double xPos, double yPos, double xVel, double yVel, std::string name): m_Mass{Mass}, m_xPos{xPos}, m_yPos{yPos}, m_xVel{xVel}, m_yVel{yVel}, m_name{name} {};
 
 	CelestialBody::CelestialBody(): m_Mass{0}, m_xPos{0}, m_yPos{0}, m_xVel{0}, m_yVel{0}, m_name{""}{};
+	CelestialBody::~CelestialBody(){};
 	//Getters
 	double CelestialBody::getxPos() const { return m_xPos;}
 	double CelestialBody::getyPos() const { return m_yPos;}
@@ -23,11 +24,10 @@ namespace Space{
 	double CelestialBody::getFy() const { return m_FyAll;}
 	double CelestialBody::getMass() const { return m_Mass;}
 	double CelestialBody::getKinEnergy() const{
-
-	if(m_isOrbiting !=nullptr)
-		return 0.5*m_Mass*((m_xVel+m_isOrbiting->getxVel())*(m_xVel+m_isOrbiting->getxVel())+(m_yVel+m_isOrbiting->getyVel())*(m_yVel+m_isOrbiting->getyVel()));
-	else
-		return 0.5*(getxVel()*getxVel() + getyVel()*getyVel())*getMass();
+		if(m_isOrbiting !=nullptr)
+			return 0.5*m_Mass*((m_xVel+m_isOrbiting->getxVel())*(m_xVel+m_isOrbiting->getxVel())+(m_yVel+m_isOrbiting->getyVel())*(m_yVel+m_isOrbiting->getyVel()));
+		else
+			return 0.5*(getxVel()*getxVel() + getyVel()*getyVel())*getMass();
 
 	}
 	std::string CelestialBody::getName() const { return m_name;}
@@ -41,6 +41,7 @@ namespace Space{
 	}
 
 	//setters
+
 	void CelestialBody::setFx(double x){ m_FxAll =x;}
 	void CelestialBody::setFy(double y){ m_FyAll =y;}
 	void CelestialBody::setxPos(double x){ m_xPos = x;}
@@ -104,16 +105,23 @@ namespace Space{
 	}
 
 	double CelestialBody::getDistX(CelestialBody* obj){
-		double x1 = getxPos();
-		double x2 = obj->getxPos();
-		return (x2-x1);
+		return (obj->getxPos()-getxPos());
 	}
 
-		double CelestialBody::getDistY(CelestialBody* obj){
 
-		double y1 = getyPos();
-		double y2 = obj->getyPos();
-		return (y2-y1);
+	double CelestialBody::getDistX(CelestialBody* obj,double x){
+		double x2 = obj->getxPos();
+		return (x2-x);
+	}
+
+	double CelestialBody::getDistY(CelestialBody* obj){
+
+		return (obj->getyPos()-getyPos());
+	}
+
+	double CelestialBody::getDistY(CelestialBody* obj,double y){
+
+		return (obj->getyPos()-y);
 	}
 	void CelestialBody::setOrbiting(CelestialBody* obj){
 		m_isOrbiting=obj;
@@ -146,6 +154,31 @@ namespace Space{
 		}
 	}
 
+	std::pair<double,double> CelestialBody::getAcc(double x, double y){
+		double Fx=0;
+		double Fy=0;
+		std::vector<CelestialBody*> bodies = getRelevantBodies();
+		for(auto i : bodies){
+			const double GMm = getMass()*i->getMass()*getG();
+			double rx=getDistX(i,x);
+			double ry=getDistY(i,y);
+			double F = GMm/(rx*rx+ry*ry);
+			if(rx<0)
+				Fx-=F*std::abs(rx)/std::sqrt(rx*rx+ry*ry);
+			else
+				Fx+=F*std::abs(rx)/std::sqrt(rx*rx+ry*ry);
+
+			if(ry<0)
+				Fy-=F*std::abs(ry)/std::sqrt(rx*rx+ry*ry);
+			else
+				Fy+=F*std::abs(ry)/std::sqrt(rx*rx+ry*ry);
+
+		}
+		return std::make_pair(Fx/getMass(),Fy/getMass());
+	}
+
+
+
 	//euler method
 	void CelestialBody::eulerStep(double dt){
 
@@ -169,27 +202,30 @@ namespace Space{
 	void CelestialBody::RK4(double dt){
 
 		double kvx[4],kvy[4],krx[4],kry[4];
-		
-		double ax= m_FxAll/m_Mass;
-		double ay =m_FyAll/m_Mass;
-		kvx[0]=ax;
-		kvy[0]=ay;
+
+		double x = getxPos();
+		double y = getyPos();
+
+
 		krx[0]=m_xVel;
 		kry[0]=m_yVel;
+		kvx[0]=getAcc(x,y).first;
+		kvy[0]=getAcc(x,y).second;
 
-		kvx[1]=ax; //assuming constant acceleration for the future step to reduce the number of computations
-		kvy[1]=ay; //this is wrong
+
 		krx[1]=m_xVel+kvx[0]*dt/2.0;
 		kry[1]=m_yVel+kvy[0]*dt/2.0;
+		kvx[1]=getAcc(x+krx[0]*dt*0.5,y+kry[0]*dt*0.5).first; 
+		kvy[1]=getAcc(x+krx[0]*dt*0.5,y+kry[0]*dt*0.5).second;
 
-		kvx[2]=ax;
-		kvy[2]=ay;
+		kvx[2]=getAcc(x+krx[1]*dt*0.5,y+kry[1]*dt*0.5).first;
+		kvy[2]=getAcc(x+krx[1]*dt*0.5,y+kry[1]*dt*0.5).second;
 		krx[2]=m_xVel+kvx[1]*dt/2.0;
 		kry[2]=m_yVel+kvy[1]*dt/2.0;
 
 
-		kvx[3]=ax;
-		kvy[3]=ay;
+		kvx[3]=getAcc(x+krx[2]*dt,y+kry[2]*dt).first;
+		kvy[3]=getAcc(x+krx[2]*dt,y+kry[2]*dt).second;
 		krx[3]=m_xVel+kvx[2]*dt;
 		kry[3]=m_yVel+kvy[2]*dt;
 

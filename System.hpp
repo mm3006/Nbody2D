@@ -11,8 +11,10 @@ namespace Space{
         protected:
             std::vector<CelestialBody*> orbiting;
 
-		public:
+
+	public:
             System();
+            virtual ~System();
             virtual void addOrbitingBody(CelestialBody* );
             virtual void printObjects() const;
             virtual std::vector<CelestialBody* > getOribttingBodies() const;
@@ -21,7 +23,7 @@ namespace Space{
             virtual double calculatePotentialEnergy() const;
             virtual double calculateKineticEnergy() const;
             virtual void saveOutput(int body, double time,std::string name) const;
-            void evolve(int ,double , int ,int ,std::string ,bool );
+            virtual void evolve(int ,double , int ,int ,std::string ,bool );
             virtual void readFile(std::string);
 
 	};

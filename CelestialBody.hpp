@@ -10,6 +10,7 @@ namespace Space{
 class CelestialBody{
 
 	protected:
+
 		static constexpr double m_G = 6.674e-11;
 		const double m_Mass;
 		double m_xPos;
@@ -20,7 +21,7 @@ class CelestialBody{
 		double m_FyAll;
 		const std::string m_name;
 		std::vector<CelestialBody*> m_orbitingBodies;
-		CelestialBody* m_isOrbiting;
+		CelestialBody* m_isOrbiting=nullptr;
 		std::vector<CelestialBody*> m_relevantBodies;
 
 
@@ -30,6 +31,7 @@ class CelestialBody{
 		CelestialBody(double Mass, double xPos, double yPos, double xVel,double yVel,std::string name,CelestialBody* isOrbiting);
 		CelestialBody(double Mass, double xPos, double yPos, double xVel,double yVel,std::string name);
 		CelestialBody();
+		virtual ~CelestialBody();
 		//getters
 		double getMass() const;
 		virtual double getxPos() const;
@@ -42,15 +44,20 @@ class CelestialBody{
 		double getG() const;
 		virtual double getDistX(CelestialBody* obj);
 		virtual double getDistY(CelestialBody* obj);
+		virtual double getDistX(CelestialBody* obj,double);
+		virtual double getDistY(CelestialBody* obj,double);
+
 		std::string getName() const;
 		std::vector<CelestialBody*> getObjects() const;
 		std::vector<CelestialBody*> getRelevantBodies() const;
 		CelestialBody* getOrbittingBody()const;
 
 		virtual void addForces();
+		virtual std::pair<double,double>  getAcc(double, double);
 		virtual void RK4(double dt);
 
 		//setters
+
 		void setxPos(double x);
 		void setyPos(double y);
 		void setxVel(double vx);

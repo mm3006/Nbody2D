@@ -14,6 +14,13 @@ namespace Space{
 
     System::System(){};
 
+	System::~System(){
+		for (auto i: orbiting){
+			delete i;
+		}
+
+	}
+
     void System::addOrbitingBody(CelestialBody*obj){
 		orbiting.push_back(obj);
 	}
@@ -188,7 +195,7 @@ void System::readFile(std::string filename = "solarsystem.csv"){
 				if(planetptr==nullptr) //if there is no parent object for moons, treat moons as other planets
 					planetptr=bodies.at(0);
 
-				bodies.push_back(new Space::Moon(stod(row.at(1)),stod(row.at(2)),stod(row.at(3)),stod(row.at(4)),stod(row.at(5)),row.at(6),planetptr));
+				bodies.push_back(new Space::Moon(stod(row.at(1)),stod(row.at(2)),stod(row.at(3)),stod(row.at(4))+planetptr->getxVel(),stod(row.at(5)),row.at(6),planetptr));
 				addOrbitingBody(bodies.at(bodies.size()-1));
 			}
 			
