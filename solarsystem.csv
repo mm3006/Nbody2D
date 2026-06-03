@@ -1,0 +1,9 @@
+Star,1.98855e30,0,0.0,0.0,0.0,Sun,
+Planet,5.97237e24 ,1.49598023e11,0.0,0.0,2.978e4,Earth,Sun
+Moon,7.342e22,3.84399e8,0.0,0.0,1.022e3,Moon,Earth
+Planet,6.4171e23,2.279392e11,0.0,0.0,2.4007e4,Mars,Sun
+Moon,1.0659e16,9.376e6,0.0,0.0,2.138e3,Phobos,Mars
+Moon,1.4762e15,-2.34632e7,0.0,0.0,-1.3513e3,Deimos,Mars
+Planet,3.3011e23,5.790905e10,0.0,0.0,4.7362e4,Mercury,Sun
+Planet,4.8675e23,1.08208e11,0.0,0.0,3.502e4,Venus,Sun
+Planet,2.2e14,5e11,-9e10 ,-7e4, 1e4,Comet,Sun

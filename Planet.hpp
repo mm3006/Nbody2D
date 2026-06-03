@@ -8,8 +8,9 @@ namespace Space{
 	class Planet: virtual public CelestialBody{
 
 		public:
-			Planet(double mass, double xPos, double yPos, double xVel, double yVel,std::string name,CelestialBody* obj);
-			virtual void addForces();
+			Planet(double mass, double xPos, double yPos, double xVel, double yVel,std::string name,std::shared_ptr<CelestialBody>obj);
+		 	virtual void PlugToOrbiting(std::shared_ptr<CelestialBody> obj);
+
 	};
 
 

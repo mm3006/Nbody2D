@@ -4,10 +4,11 @@
 #include <string>
 #include <iostream>
 #include <vector>
+#include <memory>
 namespace Space{
 
 
-class CelestialBody{
+class CelestialBody: public std::enable_shared_from_this<CelestialBody>{
 
 	protected:
 
@@ -20,37 +21,37 @@ class CelestialBody{
 		double m_FxAll;
 		double m_FyAll;
 		const std::string m_name;
-		std::vector<CelestialBody*> m_orbitingBodies;
-		CelestialBody* m_isOrbiting=nullptr;
-		std::vector<CelestialBody*> m_relevantBodies;
+		std::vector<std::shared_ptr<CelestialBody>> m_orbitingBodies;
+		std::shared_ptr<CelestialBody> m_isOrbiting=nullptr;
+		std::vector<std::shared_ptr<CelestialBody>> m_relevantBodies;
 
 
 	public:
 	
 		//Constructor
-		CelestialBody(double Mass, double xPos, double yPos, double xVel,double yVel,std::string name,CelestialBody* isOrbiting);
+		CelestialBody(double Mass, double xPos, double yPos, double xVel,double yVel,std::string name,std::shared_ptr<CelestialBody>isOrbiting);
 		CelestialBody(double Mass, double xPos, double yPos, double xVel,double yVel,std::string name);
 		CelestialBody();
-		virtual ~CelestialBody();
+		// virtual ~CelestialBody();
 		//getters
-		double getMass() const;
+		virtual double getMass() const;
 		virtual double getxPos() const;
 		virtual double getyPos() const;
 		virtual double getxVel() const;
 		virtual double getyVel() const;
-		double getFx() const;
-		double getFy() const;
+		virtual double getFx() const;
+		virtual double getFy() const;
 		virtual double getKinEnergy() const;
-		double getG() const;
-		virtual double getDistX(CelestialBody* obj);
-		virtual double getDistY(CelestialBody* obj);
-		virtual double getDistX(CelestialBody* obj,double);
-		virtual double getDistY(CelestialBody* obj,double);
-
-		std::string getName() const;
-		std::vector<CelestialBody*> getObjects() const;
-		std::vector<CelestialBody*> getRelevantBodies() const;
-		CelestialBody* getOrbittingBody()const;
+		virtual double getG() const;
+		virtual double getDistX(std::shared_ptr<CelestialBody> obj);
+		virtual double getDistY(std::shared_ptr<CelestialBody> obj);
+		virtual double getDistX(std::shared_ptr<CelestialBody> obj,double);
+		virtual double getDistY(std::shared_ptr<CelestialBody> obj,double);
+		virtual void PlugToOrbiting(std::shared_ptr<CelestialBody> obj);
+		virtual std::string getName() const;
+		virtual std::vector<std::shared_ptr<CelestialBody>> getObjects() const;
+		virtual std::vector<std::shared_ptr<CelestialBody>> getRelevantBodies() const;
+		virtual std::shared_ptr<CelestialBody> getOrbittingBody()const;
 
 		virtual void addForces();
 		virtual std::pair<double,double>  getAcc(double, double);
@@ -58,17 +59,17 @@ class CelestialBody{
 
 		//setters
 
-		void setxPos(double x);
-		void setyPos(double y);
-		void setxVel(double vx);
-		void setyVel(double vy);
-		void setFx (double fx);
-		void setFy (double fy);
-		void addOrbitingBody(CelestialBody*);
-		void setOrbiting(CelestialBody*);
-		void setRelevantBodies(CelestialBody*);
-		void eulerStep(double dt);
-		void setRelevantBodiesAll(CelestialBody* obj);
+		virtual void setxPos(double x);
+		virtual void setyPos(double y);
+		virtual void setxVel(double vx);
+		virtual void setyVel(double vy);
+		virtual void setFx (double fx);
+		virtual void setFy (double fy);
+		virtual void addOrbitingBody(std::shared_ptr<CelestialBody>);
+		virtual void setOrbiting(std::shared_ptr<CelestialBody>);
+		virtual void setRelevantBodies();
+		virtual void eulerStep(double dt);
+		virtual void setRelevantBodiesAll(std::shared_ptr<CelestialBody> obj);
 
 
 

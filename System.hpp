@@ -1,6 +1,6 @@
 #ifndef SYSTEM_HPP
 #define SYSTEM_HPP
-
+#include <memory>
 #include <vector>
 #include "CelestialBody.hpp"
 namespace Space{
@@ -9,15 +9,15 @@ namespace Space{
 	class System: virtual public CelestialBody{
 
         protected:
-            std::vector<CelestialBody*> orbiting;
+            std::vector<std::shared_ptr<CelestialBody>> orbiting;
 
 
 	public:
             System();
-            virtual ~System();
-            virtual void addOrbitingBody(CelestialBody* );
+            System(std::string,std::string,int,double,int,int,bool,bool);
+            virtual void addOrbitingBody(std::shared_ptr<CelestialBody> );
             virtual void printObjects() const;
-            virtual std::vector<CelestialBody* > getOribttingBodies() const;
+            virtual std::vector<std::shared_ptr<CelestialBody>> getOribttingBodies() const;
             virtual void calculateRelevantBodiesAll() const;
             virtual void calculateRelevantBodies() const;
             virtual double calculatePotentialEnergy() const;

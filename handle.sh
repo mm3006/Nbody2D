@@ -13,13 +13,13 @@ do
 
     echo "Processing simualtion with step size of "${i}" seconds"
     dt=${i}
-    inputName="inputs/solarsystem.csv"
-    outputName="outputs/coordsSolarRK4"${dt}".csv"
+    inputName="inputs/2starsystem.csv"
+    outputName="outputs/coordsbinaryRK4"${dt}".csv"
 
     base=10000
     N=$(($year/$dt))
     saveStep=$(($base / $dt))
-    N=10000000
+    N=3000000
 
 
     ./main ${inputName} ${outputName} ${N} ${dt} ${saveStep} ${index} ${doRK4} ${doAllinteractions}

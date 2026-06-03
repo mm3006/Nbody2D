@@ -42,25 +42,10 @@ int main(int argc, char *argv[]){
     	}
 	}
 
-	std::cout << "Starting the simulation with following parameters:\n" << "Input name: " <<  inputName << "\nOutput name: " << outputName << "\nNumber of steps: " << N <<"\nStep size (in seconds):" << dt <<"\nSave step: " << saveStep <<"\nFrame of reference object index: " << index << "\nSimulate using RK4 algorithm?: " << doRK4 << "\nAccount for all interactions?: " << doAllinteractions <<"\n"; 
+	std::cout << "===========================================================\n" <<"Starting the simulation with following parameters:\n" << "Input name: " <<  inputName << "\nOutput name: " << outputName << "\nNumber of steps: " << N <<"\nStep size (in seconds):" << dt <<"\nSave step: " << saveStep <<"\nFrame of reference object index: " << index << "\nSimulate using RK4 algorithm?: " << doRK4 << "\nAccount for all interactions?: " << doAllinteractions <<"\n===========================================================\n"; 
 	//simulation execution
 
-	Space::System* syst = new Space::System();
-	// Space::readFile(*syst,inputName); //default: solarsystem.csv
-	syst->readFile(inputName);
-
-	if(doAllinteractions)
-		syst->calculateRelevantBodiesAll();
-	
-	else
-		syst->calculateRelevantBodies();
-		
-
-	// syst->printObjects(); //info
-	syst->evolve(N,dt,saveStep,index,outputName,doRK4); //evolution
-
-	delete(syst);
-
+	Space::System system(inputName,outputName,N,dt,saveStep,index,doRK4,doAllinteractions);
 
 	return 0;
 }
