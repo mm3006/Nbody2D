@@ -2,22 +2,26 @@
 #define MOON_HPP
 
 
-#include "CelestialBody.hpp"
+#include "CelestialObject.hpp"
 
 
 namespace Space{
 
 
-	class Moon: virtual public CelestialBody{
+	class Moon: public CelestialObject{
 		public:
-			Moon(double mass, double x, double y, double vx, double vy, std::string name,std::shared_ptr<CelestialBody> obj);
+			Moon(double mass, double x, double y, double vx, double vy, std::string name,std::shared_ptr<CelestialObject> obj);
 
-			virtual double getKinEnergy() const;
-			virtual void PlugToOrbiting(std::shared_ptr<CelestialBody> obj);
-			virtual double getxPos() const;
-			virtual double getyPos() const;
-			virtual double getxVel() const;
-			virtual double getyVel() const;
+			// void PlugToOrbiting(std::shared_ptr<CelestialObject> obj)override;
+			double getKinEnergy() const override final;
+			double getxPos() const override final;
+			double getyPos() const override final;
+			double getxVel() const override final;
+			double getyVel() const override final;
+			
+
+		protected:
+			std::shared_ptr<CelestialObject> m_isOrbiting;
 
 
 	};

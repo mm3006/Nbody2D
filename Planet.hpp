@@ -1,15 +1,17 @@
 #ifndef PLANET_HPP
 #define PLANET_HPP
 
-#include "CelestialBody.hpp"
+#include "CelestialObject.hpp"
 
 
 namespace Space{
-	class Planet: virtual public CelestialBody{
+	class Planet: public virtual CelestialObject{
 
 		public:
-			Planet(double mass, double xPos, double yPos, double xVel, double yVel,std::string name,std::shared_ptr<CelestialBody>obj);
-		 	virtual void PlugToOrbiting(std::shared_ptr<CelestialBody> obj);
+			Planet(double mass, double xPos, double yPos, double xVel, double yVel,std::string name,std::shared_ptr<CelestialObject>obj);
+				
+		protected:
+			std::shared_ptr<CelestialObject> m_isOrbiting;
 
 	};
 

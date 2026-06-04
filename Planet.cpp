@@ -2,23 +2,19 @@
 #define PLANET_CPP
 
 #include "Planet.hpp"
-#include "CelestialBody.hpp"
+#include "CelestialObject.hpp"
 
 
 namespace Space{
 
-	Planet::Planet(double Mass, double x, double y, double vx, double vy,std::string name,std::shared_ptr<CelestialBody>obj): CelestialBody( Mass,  x,  y,  vx,  vy,  name, obj){
+	Planet::Planet(double Mass, double x, double y, double vx, double vy,std::string name,std::shared_ptr<CelestialObject>obj):  CelestialObject( Mass, x, y, vx, vy,  name), m_isOrbiting{obj} {
+		
 		if(obj !=nullptr){
-			setOrbiting(std::shared_ptr<CelestialBody>(obj));
+			setOrbiting(std::shared_ptr<CelestialObject>(obj));
 		}
 		m_FxAll =0;
 		m_FyAll =0;
 	};
-	void Planet::PlugToOrbiting(std::shared_ptr<CelestialBody> obj){
-		if(obj !=nullptr){
-			obj->addOrbitingBody(shared_from_this());
-		}
-	}
 
 }
 

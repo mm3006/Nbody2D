@@ -1,14 +1,13 @@
 #ifndef STAR_HPP
 #define STAR_HPP
 
-#include "CelestialBody.hpp"
-
+#include "CelestialObject.hpp"
 
 namespace Space{
 
 
 
-	class Star: virtual public CelestialBody{
+	class Star: public CelestialObject{
 
 		public:
 
