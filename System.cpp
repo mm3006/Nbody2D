@@ -146,7 +146,7 @@ void System::evolve(int N = 1000000,double dt = 36.5576, int saveStep =1000,int 
 		}
 
 		if(iter%saveStep==0){
-			std::cout << "Step number: " << iter << " out of " << N << " (" << iter*100/double(N) << "%)\r";
+			std::cout << "Step number: " << iter << " out of " << N << " (" << iter*100/double(N) << "%)\n\r";
 			std::cout.flush(); 
 			saveOutput(index,iter*dt,name);
 		}
@@ -166,6 +166,10 @@ void System::readFile(std::string filename = "solarsystem.csv"){
 		filename="solarsystem.csv";
 		std::cout <<"Load of provided file failed; defaulting to " << filename << "\n";
      	std::ifstream file(filename);
+		if(file.fail()){
+			std::cerr << "No default input file found, exiting..." <<std::endl;
+			std::_Exit(EXIT_FAILURE);
+		}
     }
 
 	if (file.is_open()){
