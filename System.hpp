@@ -1,22 +1,23 @@
 #ifndef SYSTEM_HPP
 #define SYSTEM_HPP
-#include <memory>
-#include <vector>
-#include "CelestialObject.hpp"
+// #include "ICelestialBody.hpp"
+
+#include "Factory.hpp"
+
 namespace Space{
 
 
 	class System{
 
         protected:
-            std::vector<std::shared_ptr<CelestialObject>> orbiting;
+            std::vector<std::shared_ptr<ICelestialBody>> orbiting;
 
 	    public:
             System();
             System(std::string,std::string,int,double,int,int,bool,bool);
-            void addOrbitingBody(std::shared_ptr<CelestialObject> );
+            void addOrbitingBody(std::shared_ptr<ICelestialBody> );
             void printObjects() const;
-            std::vector<std::shared_ptr<CelestialObject>> getOrbitingBodies() const;
+            std::vector<std::shared_ptr<ICelestialBody>> getOrbitingBodies() const;
             void calculateRelevantBodiesAll() const;
             void calculateRelevantBodies() const;
             double calculatePotentialEnergy() const;

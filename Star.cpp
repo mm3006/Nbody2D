@@ -5,8 +5,8 @@
 
 namespace Space{
 
-
-	Star::Star(double Mass, double xPos, double yPos, double xVel, double yVel, std::string name): CelestialObject( Mass, xPos, yPos, xVel, yVel,  name) {
+	Star::Star(){};
+	Star::Star(double Mass, double xPos, double yPos, double xVel, double yVel, std::string name): CelestialBody( Mass, xPos, yPos, xVel, yVel,  name) {
 
 	};
 

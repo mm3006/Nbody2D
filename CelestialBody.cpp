@@ -3,18 +3,13 @@
 
 #include "CelestialBody.hpp"
 #include <cmath>
-#include <ostream>
 
 namespace Space{
-
-
-
-	CelestialBody::CelestialBody(double Mass, double xPos, double yPos, double xVel, double yVel, std::string name,std::shared_ptr<CelestialBody> m_isOrbiting): m_Mass{Mass}, m_xPos{xPos}, m_yPos{yPos}, m_xVel{xVel}, m_yVel{yVel}, m_name{name}, m_isOrbiting{m_isOrbiting} {};
 
 	CelestialBody::CelestialBody(double Mass, double xPos, double yPos, double xVel, double yVel, std::string name): m_Mass{Mass}, m_xPos{xPos}, m_yPos{yPos}, m_xVel{xVel}, m_yVel{yVel}, m_name{name} {};
 
 	CelestialBody::CelestialBody(): m_Mass{0}, m_xPos{0}, m_yPos{0}, m_xVel{0}, m_yVel{0}, m_name{""}{};
-	// CelestialBody::~CelestialBody(){};
+
 	//Getters
 	double CelestialBody::getxPos() const { return m_xPos;}
 	double CelestialBody::getyPos() const { return m_yPos;}
@@ -24,20 +19,18 @@ namespace Space{
 	double CelestialBody::getFy() const { return m_FyAll;}
 	double CelestialBody::getMass() const { return m_Mass;}
 	double CelestialBody::getKinEnergy() const{
-		if(m_isOrbiting !=nullptr)
-			return 0.5*m_Mass*((m_xVel+m_isOrbiting->getxVel())*(m_xVel+m_isOrbiting->getxVel())+(m_yVel+m_isOrbiting->getyVel())*(m_yVel+m_isOrbiting->getyVel()));
-		else
+
 			return 0.5*(getxVel()*getxVel() + getyVel()*getyVel())*getMass();
 
 	}
 	std::string CelestialBody::getName() const { return m_name;}
-	std::shared_ptr<CelestialBody> CelestialBody::getOrbittingBody() const {return m_isOrbiting; }
+	std::shared_ptr<ICelestialBody> CelestialBody::getOrbittingBody() const {return m_isOrbiting; }
 	double CelestialBody::getG() const {return m_G;}
 
-	std::vector<std::shared_ptr<CelestialBody>> CelestialBody::getObjects() const{
+	std::vector<std::shared_ptr<ICelestialBody>> CelestialBody::getObjects() const{
 		return m_orbitingBodies;
 	}
-	std::vector<std::shared_ptr<CelestialBody> > CelestialBody::getRelevantBodies() const{
+	std::vector<std::shared_ptr<ICelestialBody> > CelestialBody::getRelevantBodies() const{
 		return m_relevantBodies;
 	}
 
@@ -68,16 +61,16 @@ namespace Space{
 	}
 	}
 
-	void CelestialBody::setRelevantBodiesAll(std::shared_ptr<CelestialBody> obj) {
+	void CelestialBody::setRelevantBodiesAll(std::shared_ptr<ICelestialBody> obj) {
 		m_relevantBodies.push_back(obj);
 	}
 
-	void CelestialBody::PlugToOrbiting(std::shared_ptr<CelestialBody> obj) {
+	void CelestialBody::PlugToOrbiting(std::shared_ptr<ICelestialBody> obj){
 		obj->addOrbitingBody(shared_from_this());
 	}
 
 	//print operator for the objects
- 	std::ostream& operator<<(std::ostream& os, const Space::CelestialBody& obj){
+ 	std::ostream& operator<<(std::ostream& os, const Space::ICelestialBody& obj){
 
 		auto orbiting =  obj.getObjects();
 
@@ -111,28 +104,28 @@ namespace Space{
 		return os;
 	}
 
-	double CelestialBody::getDistX(std::shared_ptr<CelestialBody> obj){
+	double CelestialBody::getDistX(std::shared_ptr<ICelestialBody> obj) const{
 		return (obj->getxPos()-getxPos());
 	}
 
 
-	double CelestialBody::getDistX(std::shared_ptr<CelestialBody> obj,double x){
+	double CelestialBody::getDistX(std::shared_ptr<ICelestialBody> obj,double x) const{
 		double x2 = obj->getxPos();
 		return (x2-x);
 	}
 
-	double CelestialBody::getDistY(std::shared_ptr<CelestialBody> obj){
+	double CelestialBody::getDistY(std::shared_ptr<ICelestialBody> obj)const{
 		return (obj->getyPos()-getyPos());
 	}
 
-	double CelestialBody::getDistY(std::shared_ptr<CelestialBody>  obj,double y){
+	double CelestialBody::getDistY(std::shared_ptr<ICelestialBody>  obj,double y)const{
 		return (obj->getyPos()-y);
 	}
-	void CelestialBody::setOrbiting(std::shared_ptr<CelestialBody> obj){
+	void CelestialBody::setOrbiting(std::shared_ptr<ICelestialBody> obj){
 		m_isOrbiting=obj;
 	}
 
-	void CelestialBody::addOrbitingBody(std::shared_ptr<CelestialBody>  obj){
+	void CelestialBody::addOrbitingBody(std::shared_ptr<ICelestialBody>  obj){
 		m_orbitingBodies.push_back(obj);
 	}
 	//evolution function
@@ -149,15 +142,10 @@ namespace Space{
 			double ry=getDistY(i);
 
 			double F = GMm/(rx*rx+ry*ry);
-			if(rx<0)
-				m_FxAll-=F*std::abs(rx)/std::sqrt(rx*rx+ry*ry);
-			else
-				m_FxAll+=F*std::abs(rx)/std::sqrt(rx*rx+ry*ry);
 
-			if(ry<0)
-				m_FyAll-=F*std::abs(ry)/std::sqrt(rx*rx+ry*ry);
-			else
-				m_FyAll+=F*std::abs(ry)/std::sqrt(rx*rx+ry*ry);
+			m_FxAll+=((rx>0)-(rx<0))*F*std::abs(rx)/std::sqrt(rx*rx+ry*ry);
+			m_FyAll+=((ry>0)-(ry<0))*F*std::abs(ry)/std::sqrt(rx*rx+ry*ry);
+
 
 		}
 	}
@@ -165,21 +153,15 @@ namespace Space{
 	std::pair<double,double> CelestialBody::getAcc(double x, double y){
 		double Fx=0;
 		double Fy=0;
-		std::vector<std::shared_ptr<CelestialBody>> bodies = getRelevantBodies();
+		std::vector<std::shared_ptr<ICelestialBody>> bodies = getRelevantBodies();
 		for(auto i : bodies){
 			const double GMm = getMass()*i->getMass()*getG();
 			double rx=getDistX(i,x);
 			double ry=getDistY(i,y);
 			double F = GMm/(rx*rx+ry*ry);
-			if(rx<0)
-				Fx-=F*std::abs(rx)/std::sqrt(rx*rx+ry*ry);
-			else
-				Fx+=F*std::abs(rx)/std::sqrt(rx*rx+ry*ry);
-
-			if(ry<0)
-				Fy-=F*std::abs(ry)/std::sqrt(rx*rx+ry*ry);
-			else
-				Fy+=F*std::abs(ry)/std::sqrt(rx*rx+ry*ry);
+			
+			m_FxAll+=((rx>0)-(rx<0))*F*std::abs(rx)/std::sqrt(rx*rx+ry*ry);
+			m_FyAll+=((ry>0)-(ry<0))*F*std::abs(ry)/std::sqrt(rx*rx+ry*ry);
 
 		}
 		return std::make_pair(Fx/getMass(),Fy/getMass());

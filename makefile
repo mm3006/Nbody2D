@@ -5,8 +5,8 @@ CXXFLAGS = -Wall -g -O3 -std=c++14
 TARGET = main
 
 TARGET_DEL = main.o
-SRCS = main.cpp Moon.cpp Planet.cpp Star.cpp System.cpp CelestialObject.cpp
-
+SRCS = main.cpp Moon.cpp Planet.cpp Star.cpp Factory.cpp System.cpp CelestialBody.cpp 
+CMAKE_EXPORT_COMPILE_COMMANDS = ON
 
 OBJS = $(SRCS:.cpp=.o)
 

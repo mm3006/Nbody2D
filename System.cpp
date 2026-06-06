@@ -5,35 +5,22 @@
 #include <cmath>
 #include <fstream>
 #include <sstream>
-
-#include "Moon.hpp"
-#include "Planet.hpp"
-#include "Star.hpp"
-
+// #include "Factory.hpp"
 
 namespace Space{
 
+    System::System(){};
 
     System::System(std::string inputName,std::string outputName,int N,double dt,int saveStep,int index,bool doRK4,bool	doAllinteractions){
 	
-	readFile(inputName);
-	if(doAllinteractions)	// System::System(){};
-		calculateRelevantBodiesAll();
-	else
-		calculateRelevantBodies();
-		
-	printObjects(); //info
-	evolve(N,dt,saveStep,index,outputName,doRK4); //evolution
-
 	};
 
 
-
-    void System::addOrbitingBody(std::shared_ptr<CelestialObject>obj){
+    void System::addOrbitingBody(std::shared_ptr<ICelestialBody>obj){
 		orbiting.push_back(obj);
 	}
 
-    std::vector<std::shared_ptr<CelestialObject>>System::getOrbitingBodies() const {
+    std::vector<std::shared_ptr<ICelestialBody>>System::getOrbitingBodies() const {
         return orbiting;
     }
 
@@ -132,36 +119,55 @@ void System::evolve(int N = 1000000,double dt = 36.5576, int saveStep =1000,int 
 	auto vect = getOrbitingBodies();
 	std::ofstream file(name);
 	file.close();
-	for(int iter = 0; iter < N ; ++iter){
+	if(doRK4){
+		for(int iter = 0; iter < N ; ++iter){
 
-		for (unsigned int i = 0 ; i< vect.size() ;++i)
-		{
-			vect[i]->addForces();
-		}
-		
-
-		for (auto i : vect){
-			if(doRK4){
-				i->RK4(dt);
-			}else{
-				i->eulerStep(dt);
+			for (unsigned int i = 0 ; i< vect.size() ;++i)
+			{
+				vect[i]->addForces();
+			}
+			
+			for (auto i : vect){
+					i->RK4(dt);
+			}
+			
+			if(iter%saveStep==0){
+				std::cout << "Step number: " << iter << " out of " << N << " (" << iter*100/double(N) << "%)\r";
+				std::cout.flush(); 
+				saveOutput(index,iter*dt,name);
 			}
 		}
-		
-		if(iter%saveStep==0){
-			std::cout << "Step number: " << iter << " out of " << N << " (" << iter*100/double(N) << "%)\r";
-			std::cout.flush(); 
-			saveOutput(index,iter*dt,name);
+	}else{
+
+		for(int iter = 0; iter < N ; ++iter){
+
+			for (unsigned int i = 0 ; i< vect.size() ;++i){
+				vect[i]->addForces();
+			}
+			
+
+			for (auto i : vect){
+					i->eulerStep(dt);
+			}
+			
+			if(iter%saveStep==0){
+				std::cout << "Step number: " << iter << " out of " << N << " (" << iter*100/double(N) << "%)\r";
+				std::cout.flush(); 
+				saveOutput(index,iter*dt,name);
+			}
 		}
 	}
+
+
 	std::cout << "\nFinished simulation!\n";
 }
 
 
 void System::readFile(std::string filename = "solarsystem.csv"){
+	auto factory = std::make_shared<CelestialBodyFactory>(CelestialBodyFactory());
 	std::string data,line;
-	std::vector<std::shared_ptr<CelestialObject>>bodies;
-	std::vector<std::string> row;
+	std::vector<std::shared_ptr<ICelestialBody>>bodies;
+	std::vector<std::basic_string<char>> row;
 
 	std::ifstream file(filename);
 
@@ -181,20 +187,20 @@ void System::readFile(std::string filename = "solarsystem.csv"){
 					row.push_back(data);
 			}
 			if(row.at(0) == "Star"){
-				addOrbitingBody(std::make_shared<Star>((Star(stod(row.at(1)),stod(row.at(2)),stod(row.at(3)),stod(row.at(4)),stod(row.at(5)),row.at(6)))));
+				addOrbitingBody(factory->createStar(row));
 			}else if (row.at(0) == "Planet") {
-				std::shared_ptr<CelestialObject> starptr=nullptr;
+				std::shared_ptr<ICelestialBody> starptr=nullptr;
 				for(auto i: getOrbitingBodies()){
 					if(i->getName() == row.at(7)){
 						starptr = i;
 					}
 				}
-				addOrbitingBody(std::make_shared<Planet>(Planet(stod(row.at(1)),stod(row.at(2)),stod(row.at(3)),stod(row.at(4)),stod(row.at(5)),row.at(6),starptr)));
+				addOrbitingBody(factory->createPlanet(row,starptr));
 				getOrbitingBodies().at(getOrbitingBodies().size()-1)->PlugToOrbiting(starptr);
 				starptr.reset();
 			}else if (row.at(0) == "Moon"){
 
-				std::shared_ptr<Space::CelestialObject> planetptr=nullptr;
+				std::shared_ptr<ICelestialBody> planetptr=nullptr;
 				for (auto i : getOrbitingBodies()){
 					if(i->getName() == row.at(7)){
 						planetptr = i;
@@ -203,7 +209,7 @@ void System::readFile(std::string filename = "solarsystem.csv"){
 				if(planetptr==nullptr){ //if there is no parent object for moons, treat moons as other planets
 					planetptr=getOrbitingBodies().at(0);
 				}
-				addOrbitingBody(std::make_shared<Moon>(Moon(stod(row.at(1)),stod(row.at(2)),stod(row.at(3)),stod(row.at(4))+planetptr->getxVel(),stod(row.at(5)),row.at(6),planetptr)));
+				addOrbitingBody(factory->createMoon(row,planetptr));
 				getOrbitingBodies().at(getOrbitingBodies().size()-1)->PlugToOrbiting(planetptr);
 
 				planetptr.reset();

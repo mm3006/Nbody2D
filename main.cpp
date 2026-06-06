@@ -1,5 +1,5 @@
 #include "System.hpp"
-
+#include <iostream>
 int main(int argc, char *argv[]){
 
 	//default values
@@ -43,9 +43,19 @@ int main(int argc, char *argv[]){
 	}
 
 	std::cout << "===========================================================\n" <<"Starting the simulation with following parameters:\n" << "Input name: " <<  inputName << "\nOutput name: " << outputName << "\nNumber of steps: " << N <<"\nStep size (in seconds):" << dt <<"\nSave step: " << saveStep <<"\nFrame of reference object index: " << index << "\nSimulate using RK4 algorithm?: " << doRK4 << "\nAccount for all interactions?: " << doAllinteractions <<"\n===========================================================\n"; 
+
 	//simulation execution
 
-	Space::System system(inputName,outputName,N,dt,saveStep,index,doRK4,doAllinteractions);
+	Space::System system;
+	system.readFile(inputName);
+	if(doAllinteractions)	// System::System(){};
+		system.calculateRelevantBodiesAll();
+	else
+		system.calculateRelevantBodies();
+		
+	system.printObjects(); //info
+	system.evolve(N,dt,saveStep,index,outputName,doRK4); //evolution
+
 
 	return 0;
 }

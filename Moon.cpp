@@ -5,10 +5,13 @@
 
 namespace Space{
 
-	Moon::Moon(double mass, double x, double y, double vx, double vy,std::string name,std::shared_ptr<CelestialObject> obj):  CelestialObject( mass, x, y, vx, vy,  name ), m_isOrbiting{obj}
+
+	Moon::Moon(){}
+
+	Moon::Moon(double mass, double x, double y, double vx, double vy,std::string name,std::shared_ptr<ICelestialBody> obj):  CelestialBody( mass, x, y, vx, vy,  name ), m_isOrbiting{obj}
 	{
 		if(obj !=nullptr){
-			setOrbiting(std::shared_ptr<CelestialObject>(obj));
+			setOrbiting(std::shared_ptr<ICelestialBody>(obj));
 		}
 		m_FxAll =0;
 		m_FyAll =0;
